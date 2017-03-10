@@ -1,2 +1,3 @@
-# competitiveprogramming
-Just personal files of various competitive problems on various sites.
+# Competitive Programming
+
+Just personal files for various competitive programming contests.
