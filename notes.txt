@@ -1,0 +1,258 @@
+# Notes
+
+## Number theory
+
+### Modular Exponentiation
+
+int modularExponentiation(int x,int n,int M)
+{
+    int result=1;
+    while(n>0)
+    {
+        if(n % 2 ==1)
+            result=(result * x)%M;
+        x=(x*x)%M;
+        n=n/2;
+    }
+    return result;
+}
+
+### Euclid Algorithm
+
+int GCD(int A, int B) {
+    if(B==0)
+        return A;
+    else
+        return GCD(B, A % B);
+}
+
+### Extended Euclidean Algorithm
+
+ax + by = gcd(a,b)
+
+#### Code
+
+int d, x, y;
+void extendedEuclid(int A, int B) {
+    if(B == 0) {
+        d = A;
+        x = 1;
+        y = 0;
+    }
+    else {
+        extendedEuclid(B, A%B);
+        int temp = x;
+        x = y;
+        y = temp - (A/B)*y;
+    }
+}
+
+### Modular Multiplicative Inverse
+
+#### First way
+
+A.B = 1 mod M
+
+B is the inverse of A mod M.
+Inverse exists if and only if, A and M are coprime.
+
+Since A and M are coprime, 
+
+Ax + My = 1
+
+Taking mod M,
+
+Ax = 1 mod M
+
+So just find x and that is the inverse.
+
+#### Code
+
+int d,x,y;
+int modInverse(int A, int M)
+{
+    extendedEuclid(A,M);
+    return (x%M+M)%M;    //x may be negative
+}
+
+
+#### Second way
+
+When M is prime, and A is not divisible by M
+
+Fermat's little theorem - 
+
+A^(M-1) = 1 (mod M)
+
+Multiplying by A^(-1) (the inverse of A) we get,
+
+A^(-1) = A^(M-2) mod M
+
+
+#### Code
+
+int modInverse(int A,int M)
+{
+    return modularExponentiation(A,M-2,M);
+} 
+
+
+
+### Sieve of Erasthenos
+
+#### Code
+void sieve(int N) {
+    bool isPrime[N+1];
+    for(int i = 0; i <= N;++i) {
+        isPrime[i] = true;
+    }
+    isPrime[0] = false;
+    isPrime[1] = false;
+    for(int i = 2; i * i <= N; ++i) {
+         if(isPrime[i] == true) {                    //Mark all the multiples of i as composite numbers
+             for(int j = i * i; j <= N ;j += i)
+                 isPrime[j] = false;
+        }
+    }
+}
+
+
+### Factorization
+
+Using Sieve of Erasthenos 
+
+
+#### Code
+
+Runs in O(sqrt(N))
+
+vector<int> factorize(int n) {
+    vector<int> res;
+    for (int i = 2; i * i <= n; ++i) {
+        while (n % i == 0) {
+            res.push_back(i);
+            n /= i;
+        }
+    }
+    if (n != 1) {
+        res.push_back(n);
+    }
+    return res;
+}
+
+### Little Modification
+
+Only possible if we create arrays of size N.
+
+int minPrime[n + 1];
+for (int i = 2; i * i <= n; ++i) {
+    if (minPrime[i] == 0) {         //If i is prime
+        for (int j = i * i; j <= n; j += i) {
+            if (minPrime[j] == 0) {
+                minPrime[j] = i;
+            }
+        }
+    }
+}
+for (int i = 2; i <= n; ++i) {
+    if (minPrime[i] == 0) {
+        minPrime[i] = i;
+    }
+}
+
+vector<int> factorize(int n) {
+    vector<int> res;
+    while (n != 1) {
+        res.push_back(minPrime[n]);
+        n /= minPrime[n];
+    }
+    return res;
+}
+
+
+
+### Segment Sieve
+
+
+#### Code
+
+bool isPrime[r - l + 1]; //filled by true
+for (long long i = 2; i * i <= r; ++i) {
+    for (long long j = max(i * i, (l + (i - 1)) / i  * i); j <= r; j += i) {
+        isPrime[j - l] = false;
+    }
+}
+for (long long i = max(l, 2); i <= r; ++i) {
+    if (isPrime[i - l]) {
+        //then i is prime
+    }
+}
+
+
+
+### Chinese Remainder Theorem
+
+
+#### Code
+
+// num is the list of numbers, which are coprime with each other
+// rem is the remainders which they give
+
+Find x?
+
+such that x % num[0] = rem[0] , and so on
+
+int findMinX(int num[], int rem[], int k)
+{
+    // Compute product of all numbers
+    int prod = 1;
+    for (int i = 0; i < k; i++)
+        prod *= num[i];
+ 
+    // Initialize result
+    int result = 0;
+ 
+    for (int i = 0; i < k; i++)
+    {
+        int pp = prod / num[i];
+        result += rem[i] * modInverse(pp, num[i]) * pp;
+    }
+ 
+    return result % prod;
+}
+
+### Euler's Totient Function
+
+Count of numbers which are less than or equal to X and are co-prime with X.
+
+For 2 number A and B, if gcd(a,b) == 1, then Totient(A)×Totient(B)=Totient(A⋅B).
+
+Totient(A) = A * Product(1 - (1/k))
+
+where k is one of the prime factor of A
+
+#### Code
+
+set<> primes;
+main()
+{
+    GeneratePrimes();
+    int N=nextInt();
+    int ans=N;
+    for(int k:primes)
+    {
+        if(N%k==0)
+        {
+            ans*=(1-1/k);
+        }
+    }
+    print(ans);
+}
+
+
+
+### Euler's theorem
+
+If a and n are coprime,
+
+a ^ (totien(n)) == 1 mod n
