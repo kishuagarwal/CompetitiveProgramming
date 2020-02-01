@@ -1,3 +1,5 @@
+package QualificationRound;
+
 import java.util.*;
 
 public class SavingTheUniverse {
