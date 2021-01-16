@@ -6,4 +6,6 @@
 *.class
 output.txt
 *.DS_STORE
+*.iml
+.vscode
 production/
